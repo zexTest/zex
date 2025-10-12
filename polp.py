@@ -37,6 +37,62 @@ print(visited)
 
 
 
+from nltk.tokenize import sent_tokenize, word_tokenize, RegexpTokenizer,TweetTokenizer
+from nltk.stem import PorterStemmer
+from nltk.stem import WordNetLemmatizer
+from nltk.corpus import wordnet
+import nltk
+
+# Download required resources
+#nltk.download()
+nltk.download('punkt')
+nltk.download('wordnet')
+
+# Input text
+text = input("Enter Text:\n")
+
+# Sentence Tokenization
+sentences = sent_tokenize(text)
+print("\nSentence Tokenization:")
+print(sentences)
+
+# Word Tokenization
+words = word_tokenize(text)
+print("\nWord Tokenization:")
+print(words)
+
+#Regex Tokenization
+tokenizer = RegexpTokenizer(r'\w+')
+print("\nRegex Tokens:",tokenizer.tokenize(text))
+
+#tweet Tokenization
+tokenizer = TweetTokenizer()
+print("\nTweet Tokenizer:",tokenizer.tokenize(text))
+
+# Stemming
+stemmer = PorterStemmer()
+stemmed_words = [stemmer.stem(word) for word in words]
+print("\nStemming:")
+print(stemmed_words)
+
+# Lemmatization
+lemmatizer = WordNetLemmatizer()
+lemmatized_words = [lemmatizer.lemmatize(word) for word in words]
+print("\nLemmatization:")
+print(lemmatized_words)
+
+# Lemmatization with POS tagging
+def get_wordnet_pos(word):
+    tag = nltk.pos_tag([word])[0][1][0].upper()
+    tag_dict = {"J": wordnet.ADJ, "N": wordnet.NOUN, "V": wordnet.VERB, "R": wordnet.ADV}
+    return tag_dict.get(tag, wordnet.NOUN)
+
+lemmatized_with_pos = [lemmatizer.lemmatize(word, get_wordnet_pos(word)) for word in words]
+print("\nLemmatization with POS tagging:")
+print(lemmatized_with_pos)
+
+
+
 
 
 
@@ -408,3 +464,4 @@ print("Original Text: ", text)
 print("Tokenized Words: ", words)
 print("Stemmed Words: ", stemmed_words)
 print("Lemmatized Words: ", lemmatized_words)
+
