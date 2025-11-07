@@ -35,61 +35,133 @@ print(visited)
 
 
 
-
-
-from nltk.tokenize import sent_tokenize, word_tokenize, RegexpTokenizer,TweetTokenizer
+#STEMMING
 from nltk.stem import PorterStemmer
-from nltk.stem import WordNetLemmatizer
-from nltk.corpus import wordnet
+ps=PorterStemmer()
+wordset1 = ["playing", "played", "plays", "studies", "running", "happily"]
+wordset2 = ["running", "runs", "easily", "fairness", "connections"]
+wordset3 = ["fishing", "fished", "fisherman", "argues", "arguing", 
+            "argument", "happiness", "competition", "universal", "university"]
+def stem_word(wordset,set_number):
+    print(f"Wordset{set_number}")
+    for word in wordset:
+        print(f"{word}-->{ps.stem(word)}")
+        print("\n")
+stem_word(wordset1, 1)
+stem_word(wordset2, 2)
+stem_word(wordset3, 3)
+
+            
+
+
+
+
+#LEMMATIZATION
 import nltk
+from nltk.stem import PorterStemmer,WordNetLemmatizer
+from nltk.tokenize import word_tokenize
 
-# Download required resources
-#nltk.download()
-nltk.download('punkt')
-nltk.download('wordnet')
+nltk.download("punkt")
+nltk.download("wordnet")
+nltk.download("omw-1.4")
+ps=PorterStemmer()
+lemmatizer =WordNetLemmatizer()
+text= "Hello everyone. This is Natural Language Processing."
+tokens=word_tokenize(text)
+stemmed_words=[ps.stem(word) for word in tokens]
+lemmatized_words=[lemmatizer.lemmatize(word,pos="v") for word in tokens]
+print("Original text:",text)
+print("Tokenized Words: ", tokens)
+print("Stemmed Words: ", stemmed_words)
+print("Lemmatized Words: ", lemmatized_words)
 
-# Input text
-text = input("Enter Text:\n")
 
-# Sentence Tokenization
-sentences = sent_tokenize(text)
-print("\nSentence Tokenization:")
-print(sentences)
 
-# Word Tokenization
-words = word_tokenize(text)
-print("\nWord Tokenization:")
-print(words)
 
-#Regex Tokenization
-tokenizer = RegexpTokenizer(r'\w+')
-print("\nRegex Tokens:",tokenizer.tokenize(text))
+#TEXT CLASSIFICATION
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.feature_extraction.text import CountVectorizer
+documents = [
+    "This is a positive review.",
+    "Great product, highly recommend.",
+    "Terrible experience, very disappointed.",
+    "Not satisfied with the service.",
+    "Excellent quality and fast delivery."
+]
+labels = ["positive", "positive", "negative", "negative", "positive"]
+vectorizer = CountVectorizer()
+X = vectorizer.fit_transform(documents)
+model = MultinomialNB()
+model.fit(X, labels)
+new_document = [
+    "This product is amazing!",
+    "I am very disappointed with this movie."
+]
+new_X = vectorizer.transform(new_document)
+prediction = model.predict(new_X)
+print(f"The new documents are classified as: {prediction}")
 
-#tweet Tokenization
-tokenizer = TweetTokenizer()
-print("\nTweet Tokenizer:",tokenizer.tokenize(text))
 
-# Stemming
-stemmer = PorterStemmer()
-stemmed_words = [stemmer.stem(word) for word in words]
-print("\nStemming:")
-print(stemmed_words)
 
-# Lemmatization
-lemmatizer = WordNetLemmatizer()
-lemmatized_words = [lemmatizer.lemmatize(word) for word in words]
-print("\nLemmatization:")
-print(lemmatized_words)
 
-# Lemmatization with POS tagging
-def get_wordnet_pos(word):
-    tag = nltk.pos_tag([word])[0][1][0].upper()
-    tag_dict = {"J": wordnet.ADJ, "N": wordnet.NOUN, "V": wordnet.VERB, "R": wordnet.ADV}
-    return tag_dict.get(tag, wordnet.NOUN)
 
-lemmatized_with_pos = [lemmatizer.lemmatize(word, get_wordnet_pos(word)) for word in words]
-print("\nLemmatization with POS tagging:")
-print(lemmatized_with_pos)
+
+
+TEXT GENERATION HUGGING FACE
+from transformers import pipeline
+generator = pipeline("text-generation", model="distilgpt2")
+generator = pipeline("text-generation", model="gpt2-medium")
+generator = pipeline("text-generation", model="gpt2")
+prompt = "The continent of Europe is "
+outputs = generator(prompt, max_new_tokens=100, pad_token_id=50256)
+print(outputs[0]["generated_text"])
+
+
+
+
+TEXT SUMMARIZATION HUGGING FACE 
+from transformers import pipeline
+summarizer = pipeline("summarization", model="sshleifer/distilbart-cnn-12-6")
+articles = [
+    """Natural Language Processing (NLP) is a field of artificial intelligence that focuses on the interaction 
+    between computers and human language. It enables tasks such as text classification, translation, summarization, 
+    and question answering. Modern NLP often uses transformer-based models, which have significantly improved 
+    the accuracy and efficiency of language tasks. Applications of NLP can be seen in chatbots, search engines, 
+    voice assistants, and even in healthcare where doctors use NLP tools to process patient records and medical 
+    research papers. The combination of deep learning and vast datasets has allowed NLP to achieve human-like 
+    performance in many language-related tasks.""",
+    """Mindfulness is a practice of being aware of the present moment. Research shows it helps reduce stress, 
+    improves concentration, and supports emotional regulation. Many schools and workplaces now incorporate 
+    mindfulness exercises into daily routines. For example, some companies encourage employees to take short 
+    breaks for breathing exercises, meditation, or reflection to enhance productivity and creativity. Studies 
+    have also shown that regular mindfulness practice can reduce anxiety, improve sleep quality, and boost 
+    overall mental health. With the growing awareness of mental well-being, mindfulness has become an essential 
+    component of modern lifestyles and is increasingly recommended by health professionals worldwide."""
+]
+for arti in articles:
+    summ = summarizer(arti, max_new_tokens=80, min_length=30, do_sample=False)
+    print("Original:", arti, "\n\nSummary:", summ[0]["summary_text"], "\n")
+
+
+
+
+
+
+
+
+#SENTIMENT ANALYSIS
+from transformers import pipeline
+sentiment = pipeline("sentiment-analysis")
+texts = [
+    "I love teaching Natural Language Processing!",
+    "This assignment is terribly confusing.",
+    "The workshop was very helpful and fun!!",
+    "I didn't like the food",
+    "I loved the pizza"]
+for t in texts:
+    result = sentiment(t)[0]
+    print(f"Text: {t}\n - Label: {result['label']}, Score: {result['score']:.4f}\n")
+
 
 
 
@@ -328,7 +400,7 @@ if __name__ == '__main__':
 
 
 
-
+#A
 import heapq
 
 GRAPH = {
